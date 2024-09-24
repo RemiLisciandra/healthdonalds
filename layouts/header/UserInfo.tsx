@@ -1,7 +1,7 @@
 "use client";
 
 import { useUserStore } from "@/hooks/useUserStore";
-import { User } from "lucide-react";
+import { User, ShieldCheck, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
   Popover,
@@ -16,11 +16,16 @@ type UserInfoProps = {
 
 const UserInfo = ({ username }: UserInfoProps) => {
   const logout = useUserStore((state) => state.logout);
+  const isAdmin = useUserStore((state) => state.isAdmin);
   const router = useRouter();
 
   const handleLogout = () => {
     logout();
     router.push("/login");
+  };
+
+  const handleAdminAccess = () => {
+    router.push("/items/new");
   };
 
   return (
@@ -31,14 +36,25 @@ const UserInfo = ({ username }: UserInfoProps) => {
           <span className="mr-3">{username}</span>
         </div>
       </PopoverTrigger>
-      <PopoverContent className="w-30">
-        <div className="flex flex-col items-start border-none p-2">
+      <PopoverContent className="w-48">
+        <div className="flex flex-col items-start p-2">
+          {isAdmin && (
+            <Button
+              variant="default"
+              className="mb-2 flex w-full items-center justify-start space-x-2"
+              onClick={handleAdminAccess}
+            >
+              <ShieldCheck />
+              <span>Admin Panel</span>
+            </Button>
+          )}
           <Button
-            className="border-none"
             variant="destructive"
+            className="flex w-full items-center justify-start space-x-2"
             onClick={handleLogout}
           >
-            Logout
+            <LogOut size={20} />
+            <span>Logout</span>
           </Button>
         </div>
       </PopoverContent>

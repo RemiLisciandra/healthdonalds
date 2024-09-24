@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 
-const FormSchema = z.object({
+const formSchema = z.object({
   username: z
     .string()
     .min(2, { message: "The name must contain at least 2 characters" })
@@ -28,7 +28,7 @@ export default function Login() {
   const router = useRouter();
 
   const form = useForm({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(formSchema),
     defaultValues: {
       username: "",
     },
@@ -86,7 +86,7 @@ export default function Login() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-row gap-2"
             >
-              <div className="w-[200px]">
+              <div className="w-[300px]">
                 <FormField
                   control={form.control}
                   name="username"

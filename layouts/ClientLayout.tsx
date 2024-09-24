@@ -29,21 +29,23 @@ export default function ClientLayout({
   }, [hasHydrated, username, router, pathname]);
 
   return (
-    <div className="mx-auto flex min-h-screen w-[500px] flex-col items-center border border-gray-200 shadow">
-      <HeaderBar>
-        <div
-          className="flex cursor-pointer flex-row items-center"
-          onClick={() => username && router.push("/")}
-        >
-          <Logo />
-          <Title>Healthdonalds</Title>
-        </div>
-        <div className="flex flex-row items-center">
-          {username && <UserInfo username={username} />}
-          <PannerButton counter={0} />
-        </div>
-      </HeaderBar>
-      <main>{children}</main>
-    </div>
+    <>
+      <div className="mx-auto flex min-h-screen w-[500px] flex-col items-center border border-gray-200 shadow">
+        <HeaderBar>
+          <div
+            className="flex cursor-pointer flex-row items-center"
+            onClick={() => username && router.push("/")}
+          >
+            <Logo />
+            <Title>Healthdonalds</Title>
+          </div>
+          <div className="flex flex-row items-center">
+            {username && <UserInfo username={username} />}
+            <PannerButton counter={0} />
+          </div>
+        </HeaderBar>
+        <main>{children}</main>
+      </div>
+    </>
   );
 }
