@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/app/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { ShoppingBasket } from "lucide-react";
 
 type PannerButtonProps = {
