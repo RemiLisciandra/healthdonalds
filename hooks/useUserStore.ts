@@ -8,6 +8,8 @@ type User = {
   isAdmin: boolean;
   setUserName: (name: string) => void;
   logout: () => void;
+  hasHydrated: boolean;
+  setHasHydrated: (state: boolean) => void;
 };
 
 export const useUserStore = create<User>()(
@@ -15,19 +17,24 @@ export const useUserStore = create<User>()(
     (set) => ({
       username: null,
       isAdmin: false,
+      hasHydrated: false,
       setUserName: (name: string) =>
         set(() => ({
-          userName: name,
+          username: name,
           isAdmin: name === "admin",
         })),
       logout: () =>
         set(() => ({
-          userName: null,
+          username: null,
           isAdmin: false,
         })),
+      setHasHydrated: (state: boolean) => set({ hasHydrated: state }),
     }),
     {
       name: "username-storage",
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

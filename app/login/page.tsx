@@ -1,5 +1,6 @@
 "use client";
 
+import { useUserStore } from "@/hooks/useUserStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,6 +14,7 @@ import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useRouter } from "next/navigation";
 
 const FormSchema = z.object({
   username: z
@@ -22,6 +24,9 @@ const FormSchema = z.object({
 });
 
 export default function Login() {
+  const setUsername = useUserStore((state) => state.setUserName);
+  const router = useRouter();
+
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -30,7 +35,8 @@ export default function Login() {
   });
 
   const onSubmit = (data: { username: string }) => {
-    console.log("Formulaire soumis avec : ", data);
+    setUsername(data.username);
+    router.push("/");
   };
 
   return (
