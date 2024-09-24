@@ -5,12 +5,21 @@ import Logo from "../layouts/header/Logo";
 import PannerButton from "../layouts/header/PannerButton";
 import Title from "../layouts/header/Title";
 import UserInfo from "../layouts/header/UserInfo";
-import { useAuth } from "../hooks/useAuth";
+import { useUserStore } from "../hooks/useUserStore";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function ClientLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const { username } = useAuth();
+  const { username } = useUserStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!username) {
+      router.push("/login");
+    }
+  }, [username, router]);
 
   return (
     <div className="mx-auto flex min-h-screen w-[500px] flex-col items-center border border-gray-200 shadow">
