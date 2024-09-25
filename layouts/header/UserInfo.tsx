@@ -37,10 +37,12 @@ const UserInfo = ({ username }: UserInfoProps) => {
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-48">
+        <h1 className="text-md text-center font-bold text-gray-600">
+          Action (s)
+        </h1>
         <div className="flex flex-col items-start p-2">
           {isAdmin && (
             <Button
-              variant="default"
               className="mb-2 flex w-full items-center justify-start space-x-2"
               onClick={handleAdminAccess}
             >

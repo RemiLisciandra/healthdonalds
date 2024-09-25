@@ -4,7 +4,7 @@ import Image from "next/image";
 
 interface ImageInputProps {
   id: string;
-  image: string;
+  image: File | null;
   onChange: (file: File) => void;
 }
 
@@ -13,7 +13,9 @@ export const ImageInput: React.FC<ImageInputProps> = ({
   image,
   onChange,
 }) => {
-  const [previewImage, setPreviewImage] = useState<string | null>(image);
+  const [previewImage, setPreviewImage] = useState<string | null>(
+    image ? URL.createObjectURL(image) : null,
+  );
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

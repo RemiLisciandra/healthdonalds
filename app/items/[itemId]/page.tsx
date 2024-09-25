@@ -5,10 +5,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/ui/loader";
 import { Input } from "@/components/ui/input";
 import { CATEGORIES } from "@/lib/categories";
 import { ImageInput } from "@/components/admin/item/ImageInput";
 import Image from "next/image";
+import { generateIdByName } from "@/lib/utils";
+import { useState, useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -25,16 +28,32 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 
+type Item = {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  image: File | null;
+};
+
 const formSchema = z.object({
-  id: z.string().min(2).max(50),
+  id: z.string(),
   name: z.string().min(2).max(50),
-  category: z.string().min(2).max(50),
+  category: z.string(),
   price: z.coerce.number().min(0).max(1000),
   image: z.any(),
 });
 
 export default function NewItem() {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [item, setItem] = useState<Item>({
+    id: "",
+    name: "",
+    category: "",
+    price: 0,
+    image: null,
+  });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -43,12 +62,31 @@ export default function NewItem() {
       name: "",
       category: "",
       price: 0,
-      image: "",
+      image: null,
     },
   });
 
-  const onSubmit = () => {
+  useEffect(() => {
+    if (item.name) {
+      const generatedId = generateIdByName(item.name);
+      setItem((prevItem) => ({
+        ...prevItem,
+        id: generatedId,
+      }));
+    }
+  }, [item.name]);
+
+  const onSubmit = async () => {
+    setIsSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     router.push("/");
+  };
+
+  const handleChange = <K extends keyof Item>(field: K, value: Item[K]) => {
+    setItem((prevItem) => ({
+      ...prevItem,
+      [field]: value,
+    }));
   };
 
   return (
@@ -67,7 +105,13 @@ export default function NewItem() {
                 <FormItem>
                   <FormLabel htmlFor="name">Name</FormLabel>
                   <FormControl>
-                    <Input id="name" placeholder="Enter a name" {...field} />
+                    <Input
+                      id="name"
+                      placeholder="Enter a name"
+                      {...field}
+                      value={item.name}
+                      onChange={(e) => handleChange("name", e.target.value)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -85,6 +129,7 @@ export default function NewItem() {
                       id="id"
                       placeholder="Generated ID"
                       {...field}
+                      value={item.id}
                       readOnly
                     />
                   </FormControl>
@@ -96,11 +141,14 @@ export default function NewItem() {
             <FormField
               control={form.control}
               name="category"
-              render={({ field }) => (
+              render={() => (
                 <FormItem>
                   <FormLabel htmlFor="category">Category</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={(value) => handleChange("category", value)}
+                      value={item.category}
+                    >
                       <SelectTrigger id="category">
                         <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
@@ -129,15 +177,38 @@ export default function NewItem() {
 
             <FormField
               control={form.control}
-              name="image"
+              name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="image">Image URL</FormLabel>
+                  <FormLabel htmlFor="price">Price</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="price"
+                      type="number"
+                      placeholder="Enter item price"
+                      {...field}
+                      value={item.price}
+                      onChange={(e) =>
+                        handleChange("price", parseFloat(e.target.value))
+                      }
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="image"
+              render={() => (
+                <FormItem>
+                  <FormLabel htmlFor="image">Image</FormLabel>
                   <FormControl>
                     <ImageInput
                       id="image"
-                      image={field.value}
-                      onChange={field.onChange}
+                      image={item.image}
+                      onChange={(file: File) => handleChange("image", file)}
                     />
                   </FormControl>
                   <FormMessage />
@@ -146,10 +217,14 @@ export default function NewItem() {
             />
           </div>
 
-          <Button type="submit" onClick={onSubmit}>
-            Submit
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <Loader /> : "Submit"}
           </Button>
-          <Button variant="outline" onClick={() => router.push("/")}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/")}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
         </form>
