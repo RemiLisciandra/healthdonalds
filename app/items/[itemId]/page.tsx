@@ -12,6 +12,7 @@ import { ImageInput } from "@/components/admin/item/ImageInput";
 import Image from "next/image";
 import { generateIdByName } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import {
   Form,
   FormControl,
@@ -27,6 +28,9 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { storage, db } from "@/lib/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { doc, setDoc } from "firebase/firestore";
 
 type Item = {
   id: string;
@@ -37,10 +41,15 @@ type Item = {
 };
 
 const formSchema = z.object({
-  id: z.string(),
-  name: z.string().min(2).max(50),
-  category: z.string(),
-  price: z.coerce.number().min(0).max(1000),
+  name: z
+    .string()
+    .min(2, { message: "Name must have at least 2 characters" })
+    .max(50),
+  category: z.string().min(1, { message: "Category is required" }),
+  price: z.coerce
+    .number()
+    .min(1, { message: "Price must be at least 1" })
+    .max(1000),
   image: z.any(),
 });
 
@@ -51,19 +60,13 @@ export default function NewItem() {
     id: "",
     name: "",
     category: "",
-    price: 0,
+    price: 1,
     image: null,
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      id: "",
-      name: "",
-      category: "",
-      price: 0,
-      image: null,
-    },
+    defaultValues: item,
   });
 
   useEffect(() => {
@@ -76,10 +79,49 @@ export default function NewItem() {
     }
   }, [item.name]);
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: Omit<Item, "id">) => {
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push("/");
+
+    const finalItem = {
+      ...item,
+      ...data,
+    };
+
+    console.log(finalItem);
+
+    if (data.image instanceof File) {
+      const storageRefName = `images/${data.image.name}`;
+      const storageRef = ref(storage, storageRefName);
+
+      console.log(storageRef);
+      console.log(storageRefName);
+
+      try {
+        await uploadBytes(storageRef, data.image);
+        const downloadURL = await getDownloadURL(storageRef);
+
+        const updatedItem = {
+          ...finalItem,
+          image: downloadURL,
+          imagePath: storageRefName,
+        };
+
+        console.log(updatedItem);
+
+        const itemRef = doc(db, "items", updatedItem.id);
+        await setDoc(itemRef, updatedItem);
+
+        router.push("/");
+      } catch (error) {
+        console.error("Error uploading image or saving item:", error);
+        toast.error("Error uploading image or saving item");
+      } finally {
+        toast.error("Error uploading image or saving item");
+        setIsSubmitting(false);
+      }
+    } else {
+      return;
+    }
   };
 
   const handleChange = <K extends keyof Item>(field: K, value: Item[K]) => {
@@ -109,8 +151,10 @@ export default function NewItem() {
                       id="name"
                       placeholder="Enter a name"
                       {...field}
-                      value={item.name}
-                      onChange={(e) => handleChange("name", e.target.value)}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleChange("name", e.target.value);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -141,13 +185,16 @@ export default function NewItem() {
             <FormField
               control={form.control}
               name="category"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel htmlFor="category">Category</FormLabel>
                   <FormControl>
                     <Select
-                      onValueChange={(value) => handleChange("category", value)}
-                      value={item.category}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        handleChange("category", value);
+                      }}
+                      value={field.value}
                     >
                       <SelectTrigger id="category">
                         <SelectValue placeholder="Select a category" />
@@ -187,10 +234,10 @@ export default function NewItem() {
                       type="number"
                       placeholder="Enter item price"
                       {...field}
-                      value={item.price}
-                      onChange={(e) =>
-                        handleChange("price", parseFloat(e.target.value))
-                      }
+                      onChange={(e) => {
+                        field.onChange(e);
+                        handleChange("price", parseFloat(e.target.value));
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
