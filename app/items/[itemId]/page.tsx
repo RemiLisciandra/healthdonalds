@@ -1,18 +1,11 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/ui/loader";
 import { Input } from "@/components/ui/input";
 import { CATEGORIES } from "@/lib/categories";
 import { ImageInput } from "@/components/admin/item/ImageInput";
 import Image from "next/image";
-import { generateIdByName } from "@/lib/utils";
-import { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import {
   Form,
   FormControl,
@@ -28,108 +21,13 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { storage, db } from "@/lib/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore";
-
-type Item = {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  image: File | null;
-};
-
-const formSchema = z.object({
-  name: z
-    .string()
-    .min(2, { message: "Name must have at least 2 characters" })
-    .max(50),
-  category: z.string().min(1, { message: "Category is required" }),
-  price: z.coerce
-    .number()
-    .min(1, { message: "Price must be at least 1" })
-    .max(1000),
-  image: z.any(),
-});
+import { useItemForm } from "@/hooks/useItemForm";
+import { useRouter } from "next/navigation";
 
 export default function NewItem() {
+  const { form, onSubmit, handleChange, item, isSubmitting } = useItemForm();
+
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [item, setItem] = useState<Item>({
-    id: "",
-    name: "",
-    category: "",
-    price: 1,
-    image: null,
-  });
-
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: item,
-  });
-
-  useEffect(() => {
-    if (item.name) {
-      const generatedId = generateIdByName(item.name);
-      setItem((prevItem) => ({
-        ...prevItem,
-        id: generatedId,
-      }));
-    }
-  }, [item.name]);
-
-  const onSubmit = async (data: Omit<Item, "id">) => {
-    setIsSubmitting(true);
-
-    const finalItem = {
-      ...item,
-      ...data,
-    };
-
-    console.log(finalItem);
-
-    if (data.image instanceof File) {
-      const storageRefName = `images/${data.image.name}`;
-      const storageRef = ref(storage, storageRefName);
-
-      console.log(storageRef);
-      console.log(storageRefName);
-
-      try {
-        await uploadBytes(storageRef, data.image);
-        const downloadURL = await getDownloadURL(storageRef);
-
-        const updatedItem = {
-          ...finalItem,
-          image: downloadURL,
-          imagePath: storageRefName,
-        };
-
-        console.log(updatedItem);
-
-        const itemRef = doc(db, "items", updatedItem.id);
-        await setDoc(itemRef, updatedItem);
-
-        router.push("/");
-      } catch (error) {
-        console.error("Error uploading image or saving item:", error);
-        toast.error("Error uploading image or saving item");
-      } finally {
-        toast.error("Error uploading image or saving item");
-        setIsSubmitting(false);
-      }
-    } else {
-      return;
-    }
-  };
-
-  const handleChange = <K extends keyof Item>(field: K, value: Item[K]) => {
-    setItem((prevItem) => ({
-      ...prevItem,
-      [field]: value,
-    }));
-  };
 
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4 py-5">
@@ -164,17 +62,18 @@ export default function NewItem() {
 
             <FormField
               control={form.control}
-              name="id"
+              name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="id">ID</FormLabel>
+                  <FormLabel htmlFor="slug">Slug</FormLabel>
                   <FormControl>
                     <Input
-                      id="id"
-                      placeholder="Generated ID"
+                      id="slug"
+                      placeholder="Generated slug"
                       {...field}
-                      value={item.id}
+                      value={item.slug}
                       readOnly
+                      onChange={(e) => handleChange("slug", e.target.value)}
                     />
                   </FormControl>
                   <FormMessage />

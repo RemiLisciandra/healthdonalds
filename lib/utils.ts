@@ -5,6 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function generateIdByName(name: string): string {
+export function generateSlugByName(name: string): string {
   return name.trim().toLowerCase().replace(/\s+/g, "-");
 }
