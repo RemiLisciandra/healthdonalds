@@ -16,7 +16,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Healthdonalds",
-  description: "Description de l'application Healthdonalds",
+  description: "",
 };
 
 export default function RootLayout({

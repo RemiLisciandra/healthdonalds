@@ -9,6 +9,8 @@ import { useUserStore } from "../hooks/useUserStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export default function ClientLayout({
   children,
@@ -44,6 +46,7 @@ export default function ClientLayout({
         </HeaderBar>
         <main>{children}</main>
       </div>
+      <ToastContainer />
     </>
   );
 }
