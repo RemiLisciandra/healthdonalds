@@ -62,15 +62,15 @@ export const useItemForm = () => {
     }));
   };
 
-  const convertFileToBuffer = (file: File): Promise<Buffer> => {
+  const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const arrayBuffer = reader.result as ArrayBuffer;
-        resolve(Buffer.from(arrayBuffer));
+        const base64String = reader.result?.toString().split(",")[1];
+        resolve(base64String || "");
       };
       reader.onerror = reject;
-      reader.readAsArrayBuffer(file);
+      reader.readAsDataURL(file);
     });
   };
 
@@ -78,9 +78,10 @@ export const useItemForm = () => {
     setIsSubmitting(true);
 
     try {
-      let imageBuffer: Buffer | null = null;
+      let imageBase64: string | null = null;
+
       if (data.image) {
-        imageBuffer = await convertFileToBuffer(data.image);
+        imageBase64 = await convertFileToBase64(data.image);
       }
 
       const response = await fetch("/api/items", {
@@ -93,7 +94,7 @@ export const useItemForm = () => {
           slug: slug,
           category: data.category,
           price: data.price,
-          image: imageBuffer ? imageBuffer.toString("base64") : null,
+          image: imageBase64,
         }),
       });
 

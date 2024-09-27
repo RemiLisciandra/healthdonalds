@@ -147,14 +147,17 @@ export default function NewItem() {
             <FormField
               control={form.control}
               name="image"
-              render={() => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel htmlFor="image">Image</FormLabel>
                   <FormControl>
                     <ImageInput
                       id="image"
                       image={item.image}
-                      onChange={(file: File) => handleChange("image", file)}
+                      onChange={(file: File) => {
+                        field.onChange(file);
+                        handleChange("image", file);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

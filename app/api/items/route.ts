@@ -6,9 +6,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { name, slug, category, price, image } = body;
 
-    if (!slug) {
-      return NextResponse.json({ error: "Slug is required" }, { status: 400 });
-    }
+    const imageBuffer = image ? Buffer.from(image, "base64") : null;
 
     const newItem = await prisma.item.create({
       data: {
@@ -16,7 +14,7 @@ export async function POST(req: Request) {
         slug,
         category,
         price,
-        image,
+        image: imageBuffer,
       },
     });
 

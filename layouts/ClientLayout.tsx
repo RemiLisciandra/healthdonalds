@@ -18,8 +18,6 @@ export default function ClientLayout({
   const router = useRouter();
   const pathname = usePathname();
 
-  console.log(pathname);
-
   useEffect(() => {
     if (hasHydrated && !username) {
       router.push("/login");
