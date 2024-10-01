@@ -5,28 +5,18 @@ import Logo from "../layouts/header/Logo";
 import PannerButton from "../layouts/header/PannerButton";
 import Title from "../layouts/header/Title";
 import UserInfo from "../layouts/header/UserInfo";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useUserStore } from "../hooks/useUserStore";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
-import "react-toastify/dist/ReactToastify.css";
-import { ToastContainer } from "react-toastify";
+import { useClientLayout } from "@/hooks/useClientLayout";
 
 export default function ClientLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const username = useUserStore((state) => state.username);
-  const hasHydrated = useUserStore((state) => state.hasHydrated);
   const router = useRouter();
-  const pathname = usePathname();
-
-  useEffect(() => {
-    if (hasHydrated && !username) {
-      router.push("/login");
-    }
-
-    if (username && pathname === "/login") router.push("/");
-  }, [hasHydrated, username, router, pathname]);
+  useClientLayout();
 
   return (
     <>
@@ -44,7 +34,7 @@ export default function ClientLayout({
             <PannerButton counter={0} />
           </div>
         </HeaderBar>
-        <main>{children}</main>
+        <main className="h-full w-full">{children}</main>
       </div>
       <ToastContainer />
     </>

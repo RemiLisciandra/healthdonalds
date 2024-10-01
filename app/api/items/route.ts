@@ -35,3 +35,31 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to add item" }, { status: 500 });
   }
 }
+
+export async function GET() {
+  try {
+    const items = await prisma.item.findMany({
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        image: true,
+      },
+    });
+
+    const formattedItems = items.map((item) => ({
+      ...item,
+      image: item.image
+        ? `data:image/png;base64,${item.image.toString("base64")}`
+        : null,
+    }));
+
+    return NextResponse.json(formattedItems, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching items:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch items" },
+      { status: 500 },
+    );
+  }
+}

@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Loader } from "@/components/ui/loader";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/app/components/ui/button";
+import { Loader } from "@/app/components/ui/loader";
+import { Input } from "@/app/components/ui/input";
 import { CATEGORIES } from "@/lib/categories";
-import { ImageInput } from "@/components/admin/item/ImageInput";
+import { ImageInput } from "@/app/components/ImageInput";
 import Image from "next/image";
 import {
   Form,
@@ -13,20 +13,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/app/components/ui/form";
 import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
-} from "@/components/ui/select";
+} from "@/app/components/ui/select";
 import { useItemForm } from "@/hooks/useItemForm";
 import { useRouter } from "next/navigation";
 
 export default function NewItem() {
   const { form, onSubmit, handleChange, item, isSubmitting } = useItemForm();
-
   const router = useRouter();
 
   return (

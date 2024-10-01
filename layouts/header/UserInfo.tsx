@@ -7,8 +7,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
+} from "@/app/components/ui/popover";
+import { Button } from "@/app/components/ui/button";
 
 type UserInfoProps = {
   username: string;
@@ -25,7 +25,7 @@ const UserInfo = ({ username }: UserInfoProps) => {
   };
 
   const handleAdminAccess = () => {
-    router.push("/items/new");
+    router.push("/admin/items/new");
   };
 
   return (

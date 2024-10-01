@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import Cookies from "js-cookie";
 
 type User = {
   username: string | null;
@@ -18,16 +19,36 @@ export const useUserStore = create<User>()(
       username: null,
       isAdmin: false,
       hasHydrated: false,
-      setUserName: (name: string) =>
+
+      setUserName: (name: string) => {
         set(() => ({
           username: name,
           isAdmin: name === "admin",
-        })),
-      logout: () =>
+        }));
+
+        Cookies.set(
+          "username-storage",
+          JSON.stringify({
+            username: name,
+            isAdmin: name === "admin",
+          }),
+          {
+            expires: 7,
+            path: "/",
+            sameSite: "lax",
+          },
+        );
+      },
+
+      logout: () => {
         set(() => ({
           username: null,
           isAdmin: false,
-        })),
+        }));
+
+        Cookies.remove("username-storage");
+      },
+
       setHasHydrated: (state: boolean) => set({ hasHydrated: state }),
     }),
     {

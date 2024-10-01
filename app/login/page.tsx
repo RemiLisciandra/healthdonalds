@@ -1,15 +1,15 @@
 "use client";
 
 import { useUserStore } from "@/hooks/useUserStore";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/app/components/ui/button";
+import { Input } from "@/app/components/ui/input";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form";
+} from "@/app/components/ui/form";
 import Image from "next/image";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -41,7 +41,7 @@ export default function Login() {
 
   return (
     <div className="relative flex h-full flex-col items-center justify-center gap-4 py-5">
-      <div className="absolute -left-12 -top-0">
+      <div className="absolute -left-0 -top-0">
         <Image
           src="/images/categories/burger.png"
           alt="Burger"
@@ -49,7 +49,7 @@ export default function Login() {
           height={50}
         />
       </div>
-      <div className="absolute -right-10 -top-0">
+      <div className="absolute -right-0 -top-0">
         <Image
           src="/images/categories/dessert.png"
           alt="dessert"
@@ -57,7 +57,7 @@ export default function Login() {
           height={50}
         />
       </div>
-      <div className="absolute -bottom-7 -right-10">
+      <div className="absolute -bottom-7 -right-0">
         <Image
           src="/images/categories/fries.png"
           alt="fries"
@@ -65,7 +65,7 @@ export default function Login() {
           height={50}
         />
       </div>
-      <div className="absolute -bottom-7 -left-10">
+      <div className="absolute -bottom-7 -left-0">
         <Image
           src="/images/categories/nuggets.png"
           alt="nuggets"
