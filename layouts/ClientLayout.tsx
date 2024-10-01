@@ -20,7 +20,7 @@ export default function ClientLayout({
 
   return (
     <>
-      <div className="mx-auto flex min-h-screen w-[500px] flex-col items-center border border-gray-200 shadow">
+      <div className="mx-auto flex min-h-screen w-full max-w-3xl flex-col items-center border border-gray-200 shadow">
         <HeaderBar>
           <div
             className="flex cursor-pointer flex-row items-center"
