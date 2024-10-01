@@ -2,11 +2,13 @@
 
 import { CATEGORIES } from "@/lib/categories";
 import { NavItem } from "@/app/components/NavItem";
-import { useState } from "react";
 
-export const NavBar = () => {
-  const [activeCategory, setActiveCategory] = useState(CATEGORIES[0].id);
+type NavBarProps = {
+  activeCategory: string;
+  setActiveCategory: (id: string) => void;
+};
 
+export const NavBar = ({ activeCategory, setActiveCategory }: NavBarProps) => {
   return (
     <>
       <div className="flex w-[100px] flex-col">
